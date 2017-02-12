@@ -7,6 +7,7 @@ var count = 5;
 function setup() {
   createCanvas(600, 600)
   frameRate(30)
+  textFont('Roboto Mono')
 
   mm = new MouseMarker(mouseX, mouseY);
 
@@ -142,7 +143,8 @@ var Vehicle = function(x, y, color) {
   this.maxAlertness = 60;
   this.state=1
   this.lastupdate = 0
-  this.levelup = 2000
+  this.levelup = 3000
+  this.grow = 0
 }
 
 Vehicle.prototype.update = function() {
@@ -156,7 +158,10 @@ Vehicle.prototype.update = function() {
 
     this.lastupdate = millis()
     this.state = this.state + 1
+    
   }
+  
+  this.grow = this.grow + 0.1
   
   
   this.velocity.add(this.acceleration)
@@ -197,37 +202,27 @@ Vehicle.prototype.seek = function(target) {
 Vehicle.prototype.draw = function() {
   push()
   translate(this.position.x, this.position.y)
-  rotate(this.velocity.heading() + Math.PI * 0.5);
+  
+  
+  radius = (this.r + this.alertness) * 5 +this.grow
+  
+  var circler = 255;  var circleg = 255;  var circleb = 255;
 
-  var radius = (this.r + this.alertness) * 10
+  var circler1 = 255;  var circleg1 = 255;  var circleb1 = 255;
 
-  var circler = 255;
-  var circleg = 255;
-  var circleb = 255;
+  var circler2 = 255;  var circleg2 = 255;  var circleb2 = 255;
 
-  var circler1 = 255;
-  var circleg1 = 255;
-  var circleb1 = 255;
+  var x = 0;  var y = 0;
 
-  var circler2 = 255;
-  var circleg2 = 255;
-  var circleb2 = 255;
+  var x1 = 0;  var y1 = 0;
 
-
-  var x = 0;
-  var y = 0;
-
-  var x1 = 0;
-  var y1 = 0;
-
-  var x2 = 0;
-  var y2 = 0;
+  var x2 = 0;  var y2 = 0;
 
   var speed1 = 0
-  var pull1 = 0.99;
+  var pull1 = 0.9;
+  var s = 0
 
   colorMode(RGB);
-
 
   ///
 
@@ -235,70 +230,65 @@ Vehicle.prototype.draw = function() {
   strokeWeight(5);
   noFill();
 
-  
-
   if (this.state == 1) {
 
-    circler = 255;
-    circleg = 255;
-    circleb = 255;
+    circler = 255;    circleg = 255;    circleb = 255;
 
-    circler1 = 255;
-    circleg1 = 255;
-    circleb1 = 255;
+    circler1 = 255;    circleg1 = 255;    circleb1 = 255;
 
-    circler2 = 255;
-    circleg2 = 255;
-    circleb2 = 255;
+    circler2 = 255;    circleg2 = 255;    circleb2 = 255;
     
     speed1= 0.1
+    s = 'LIGHT'
+    this.maxspeed = 4
 
   }
   if (this.state == 2) {
 
-    circler = 255;
-    circleg = 255;
-    circleb = 255;
+    circler = 255;    circleg = 255;    circleb = 255;
 
-    circler1 = 255;
-    circleg1 = 255;
-    circleb1 = 255;
+    circler1 = 255;    circleg1 = 255;    circleb1 = 255;
 
-    circler2 = 255;
-    circleg2 = 255;
-    circleb2 = 255;
+    circler2 = 255;    circleg2 = 255;    circleb2 = 255;
 
-    speed1 = 0.5;
-    pull1 = 0.99;
+    speed1 = 0.3;
+    pull1 = 0.9;
+    s = 'DEEP'
+    this.maxspeed = 2
 
   }
   if (this.state == 3) {
 
     //circles
-    circler = 255;
-    circleg = 0;
-    circleb = 0;
+    circler = 255;    circleg = 0;    circleb = 0;
 
-    circler1 = 0;
-    circleg1 = 255;
-    circleb1 = 0;
+    circler1 = 0;    circleg1 = 255;    circleb1 = 0;
 
-    circler2 = 0;
-    circleg2 = 0;
-    circleb2 = 255;
+    circler2 = 0;    circleg2 = 0;    circleb2 = 255;
     
-    speed1= 0.9
+    speed1= 0.5
+    pull1=0.99
+    s = 'REM'
+    this.maxspeed = 0.2
   }
   
-  x = x + random(-speed1, speed1);
-  y = y + random(-speed1, speed1);
+  x = x + random(speed1, speed1*2);
+  y = y + random(speed1, speed1*2);
 
-  x1 = x1 + random(-speed1, speed1);
-  y1 = y1 + random(-speed1, speed1);
+  x1 = x1 + random(-speed1, -speed1*2);
+  y1 = y1 + random(-speed1, -speed1*2);
 
-  x2 = x2 + random(-speed1, speed1);
-  y2 = y2 + random(-speed1, speed1);
+  x2 = x2 + random(speed1, speed1*2);
+  y2 = y2 + random(-speed1, -speed1*2);
 
+x = x * pull1;
+  y = y * pull1;
+
+  x1 = x1 * pull1;
+  y1 = y1 * pull1;
+
+  x2 = x2 * pull1;
+  y2 = y2 * pull1;
   
 
   noFill();
@@ -309,22 +299,24 @@ Vehicle.prototype.draw = function() {
   stroke(circler2, circleg2, circleb2, 50);
   ellipse(x, y, radius);
 
-  x = x * pull1;
-  y = y * pull1;
-
-  x1 = x1 * pull1;
-  y1 = y1 * pull1;
-
-  x2 = x2 * pull1;
-  y2 = y2 * pull1;
-
-  console.log(radius)
   
-  if (radius > 70){
+
+   if (radius > 100){
     this.lastupdate= millis()
     this.state= 1
+    this.grow = 0
+    
   }
-
+  stroke(20,100)
+  strokeWeight(2)
+  line(0,radius/2,0,height - this.position.y - 15)
+  
+  rotate(Math.PI*-0.5)
+  
+  fill(255)
+  textSize(height/40)
+  text(s,-height + this.position.y + 15 ,0)
+  
   pop()
 }
 
